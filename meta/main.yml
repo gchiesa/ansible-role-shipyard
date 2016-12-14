@@ -1,0 +1,13 @@
+galaxy_info:
+  author: Giuseppe Chiesa
+  description: Shipyard role for swarm managers OEL7 based
+  company:
+  license: BSD
+  min_ansible_version: 1.5
+  platforms:
+    - name: EL
+      versions:
+        - 7
+  galaxy_tags: [docker, swarm, shipyard, oraclelinux]
+dependencies:
+  - { role: gchiesa.swarm }

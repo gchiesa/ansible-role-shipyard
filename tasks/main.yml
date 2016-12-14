@@ -1,0 +1,40 @@
+---
+- include: ip_detect.yml
+
+- name: Prepare rethinkdb persistent storage
+  when:
+    - inventory_hostname in groups['swarm_managers']
+  file:
+    name: "/docker/rethinkdb/data"
+    owner: root
+    group: docker
+    state: directory
+    mode: 2770
+    setype: svirt_sandbox_file_t
+
+- name: Start rethinkdb
+  when:
+    - inventory_hostname in groups['swarm_managers']
+  docker:
+    name: shipyard_db
+    image: rethinkdb
+    volumes:
+      - /docker/rethinkdb/data:/data
+    state: reloaded
+    restart_policy: always
+
+- name: Start Controller
+  when:
+    - inventory_hostname in groups['swarm_managers']
+  docker:
+    name: shipyard_controller
+    image: shipyard/shipyard:latest
+    state: reloaded
+    restart_policy: always
+    links:
+      - shipyard_db:rethinkdb
+      - swarm_manager:swarm
+    expose: 8080
+    ports:
+      - "8080:8080"
+    command: -D server -d tcp://swarm:4000
