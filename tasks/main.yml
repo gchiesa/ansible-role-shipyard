@@ -22,6 +22,7 @@
       - /docker/rethinkdb/data:/data
     state: reloaded
     restart_policy: always
+    docker_api_version: 1.22
 
 - name: Start Controller
   when:
@@ -38,3 +39,4 @@
     ports:
       - "8080:8080"
     command: -D server -d tcp://swarm:4000
+    docker_api_version: 1.22
