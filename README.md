@@ -1,38 +1,72 @@
 Role Name
 =========
 
-A brief description of the role goes here.
-
-Requirements
-------------
-
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+Role that install Shipyard on a Swarm Cluster configured with gchiesa.swarm role
 
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+The Shipyard interface is setup based on the hosts in the hostgroups used by
+gchiesa.swarm:
+
+__swarm_managers__ : should contain the manager nodes
+
+__swarm_agents__ : should contain all the node that should be part of the swarm cluster
 
 Dependencies
 ------------
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+```gchiesa.swarm``` and its dependencies
+
 
 Example Playbook
 ----------------
 
 Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+```
+---
+- hosts: servers
+  roles:
+     - { role: gchiesa.swarm, x: 42 }
+```
+
+inventory looks like:
+
+```
+[targets:vars]
+ansible_host=localhost
+ansible_become=true
+ansible_ssh_user=vagrant
+ansible_ssh_private_key_file=~/.vagrant.d/insecure_private_key
+proxy=
+
+[consul_cluster:vars]
+consul_bootstrap_hostname=test01.local
+
+[targets]
+test01.local ansible_port=2200
+test02.local ansible_port=2201
+test03.local ansible_port=2202
+test04.local ansible_port=2203
+
+[consul_cluster]
+test01.local
+test02.local
+test03.local
+
+[swarm_agents]
+test01.local
+test02.local
+test03.local
+test04.local
+
+[swarm_managers]
+test01.local
+test02.local
+```
 
 License
 -------
 
 BSD
-
-Author Information
-------------------
-
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
