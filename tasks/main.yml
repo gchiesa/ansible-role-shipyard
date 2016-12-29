@@ -3,9 +3,28 @@
 - include: firewall.yml
 - include: rethinkdb.yml
 
-- name: Start Controller
+- name: Start First Controller
   when:
     - inventory_hostname in groups['swarm_managers']
+    - inventory_hostname == groups['swarm_managers'][0]
+  docker:
+    name: shipyard_controller
+    image: shipyard/shipyard:latest
+    state: reloaded
+    restart_policy: always
+    links:
+      - shipyard_db:rethinkdb
+      - swarm_manager:swarm
+    expose: 8080
+    ports:
+      - "8080:8080"
+    command: -D server -d tcp://swarm:4000
+    docker_api_version: 1.22
+
+- name: Start Other Controllers
+  when:
+    - inventory_hostname in groups['swarm_managers']
+    - inventory_hostname != groups['swarm_managers'][0]
   docker:
     name: shipyard_controller
     image: shipyard/shipyard:latest
