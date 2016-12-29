@@ -1,2 +1,5 @@
 ---
 # defaults file for ansible-role-shipyard
+
+# set true if the host is natted
+host_natted: false
