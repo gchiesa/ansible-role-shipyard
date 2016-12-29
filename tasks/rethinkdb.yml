@@ -1,0 +1,44 @@
+---
+- name: Prepare rethinkdb persistent storage
+  when:
+    - inventory_hostname in groups['swarm_managers']
+  file:
+    name: "/docker/rethinkdb/data"
+    owner: root
+    group: docker
+    state: directory
+    mode: 2770
+    setype: svirt_sandbox_file_t
+
+- name: Start rethinkdb master
+  when:
+    - inventory_hostname in groups['swarm_managers']
+    - inventory_hostname == groups['swarm_managers'][0]
+  docker:
+    name: shipyard_db
+    image: rethinkdb
+    expose: 29015
+    ports:
+      - "29015:29015"
+    volumes:
+      - /docker/rethinkdb/data:/data
+    state: reloaded
+    restart_policy: always
+    docker_api_version: 1.22
+
+- name: Start rethinkdb replica
+  when:
+    - inventory_hostname in groups['swarm_managers']
+    - inventory_hostname != groups['swarm_managers'][0]
+  docker:
+    name: shipyard_db
+    image: rethinkdb
+    expose: 29015
+    ports:
+      - "29015:29015"
+    volumes:
+      - /docker/rethinkdb/data:/data
+    state: reloaded
+    restart_policy: always
+    command: rethinkdb --bind all --join {{ rethinkdb_ip.stdout }}
+    docker_api_version: 1.22

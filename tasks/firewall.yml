@@ -1,0 +1,27 @@
+---
+- name: Remove the shipyard chain
+  shell: >
+    iptables -t filter -D INPUT -j shipyard &&
+    iptables -t filter  -F shipyard &&
+    iptables -t filter -X shipyard
+  ignore_errors: true
+
+- name: Create the shipyard chain
+  shell: iptables -t filter -N shipyard && iptables -t filter -I INPUT 1 -j shipyard
+
+- name: Open port for docker communication on iptables
+  iptables:
+    table: filter
+    chain: shipyard
+    # destination: "{{ host_ip.stdout }}/24"
+    destination_port: "{{ item.port }}"
+    protocol: "{{ item.proto }}"
+    state: present
+    jump: ACCEPT
+    comment: shipyard / rethinkdb
+  with_items:
+    - proto: tcp
+      port: 29015
+
+- name: Iptables save
+  shell: iptables-save > "{{ iptables_config }}"

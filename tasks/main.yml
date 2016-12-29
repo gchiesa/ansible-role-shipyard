@@ -1,28 +1,7 @@
 ---
 - include: ip_detect.yml
-
-- name: Prepare rethinkdb persistent storage
-  when:
-    - inventory_hostname in groups['swarm_managers']
-  file:
-    name: "/docker/rethinkdb/data"
-    owner: root
-    group: docker
-    state: directory
-    mode: 2770
-    setype: svirt_sandbox_file_t
-
-- name: Start rethinkdb
-  when:
-    - inventory_hostname in groups['swarm_managers']
-  docker:
-    name: shipyard_db
-    image: rethinkdb
-    volumes:
-      - /docker/rethinkdb/data:/data
-    state: reloaded
-    restart_policy: always
-    docker_api_version: 1.22
+- include: firewall.yml
+- include: rethinkdb.yml
 
 - name: Start Controller
   when:
