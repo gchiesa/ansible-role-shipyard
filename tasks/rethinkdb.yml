@@ -24,6 +24,7 @@
       - /docker/rethinkdb/data:/data
     state: reloaded
     restart_policy: always
+    command: rethinkdb --bind all --canonical-address {{ host_ip_external.stdout }}
     docker_api_version: 1.22
 
 - name: Start rethinkdb replica
@@ -40,5 +41,5 @@
       - /docker/rethinkdb/data:/data
     state: reloaded
     restart_policy: always
-    command: rethinkdb --bind all --join {{ rethinkdb_ip.stdout }}
+    command: rethinkdb --bind all --canonical-address {{ host_ip_external.stdout }} --join {{ rethinkdb_ip.stdout }}
     docker_api_version: 1.22
