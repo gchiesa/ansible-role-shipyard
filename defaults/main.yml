@@ -3,3 +3,10 @@
 
 # set true if the host is natted
 host_natted: false
+
+# LDAP configuration
+use_ldap: false
+ldap_server: ldap_hostname
+ldap_port: 389
+ldap_base_dn: "cn=test,ou=adminusers,dc=oracle,dc=com"
+ldap_default_access_level: "admin"

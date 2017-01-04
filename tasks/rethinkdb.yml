@@ -10,6 +10,14 @@
     mode: 2770
     setype: svirt_sandbox_file_t
 
+- name: Remove rethinkdb
+  docker:
+    image: rethinkdb
+    name: shipyard_db
+    state: absent
+  when:
+    - inventory_hostname in groups['swarm_managers']
+
 - name: Start rethinkdb master
   when:
     - inventory_hostname in groups['swarm_managers']

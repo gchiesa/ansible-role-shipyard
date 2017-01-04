@@ -3,6 +3,21 @@
 - include: firewall.yml
 - include: rethinkdb.yml
 
+- name: Check if LDAP support is enabled
+  shell: echo "--ldap-server {{ ldap_server }} --ldap-port {{ ldap_port }} --ldap-base-dn '{{ ldap_base_dn }}' --ldap-default-access-level {{ ldap_default_access_level}}"
+  register: ldap_arguments
+  when:
+    - use_ldap
+    - inventory_hostname in groups['swarm_managers']
+
+- name: Remove the shipyard controllers
+  docker:
+    name: shipyard_controller
+    image: shipyard/shipyard:latest
+    state: absent
+  when:
+    - inventory_hostname in groups['swarm_managers']
+
 - name: Start First Controller
   when:
     - inventory_hostname in groups['swarm_managers']
@@ -18,8 +33,13 @@
     expose: 8080
     ports:
       - "8080:8080"
-    command: -D server -d tcp://swarm:4000
+    command: "-D server -d tcp://swarm:4000 {{ ldap_arguments.stdout | default() }}"
     docker_api_version: 1.22
+
+- name: Wait for session to be created
+  shell: sleep 30
+  when:
+    - inventory_hostname in groups['swarm_managers']
 
 - name: Start Other Controllers
   when:
@@ -36,5 +56,5 @@
     expose: 8080
     ports:
       - "8080:8080"
-    command: -D server -d tcp://swarm:4000
+    command: "-D server -d tcp://swarm:4000 {{ ldap_arguments.stdout | default() }}"
     docker_api_version: 1.22
