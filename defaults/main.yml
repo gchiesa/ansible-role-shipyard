@@ -8,5 +8,5 @@ host_natted: false
 use_ldap: false
 ldap_server: ldap_hostname
 ldap_port: 389
-ldap_base_dn: "cn=test,ou=adminusers,dc=oracle,dc=com"
+ldap_base_dn: "cn=test,ou=adminusers,dc=domain,dc=com"
 ldap_default_access_level: "admin"
