@@ -11,3 +11,4 @@ galaxy_info:
   galaxy_tags: [docker, swarm, shipyard, oraclelinux]
 dependencies:
   - { role: gchiesa.swarm }
+  - { role: gchiesa.iputils, tags: ['common', 'rethinkdb']}
